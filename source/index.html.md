@@ -22,24 +22,6 @@ Welcome to the Curatr API! You can use our API to access Curatr API endpoints, w
 
 ## Get an access token
 
-This endpoint gets a new OAuth token.
-
-### HTTP Request
-
-`GET http://example.curatr3.com/oauth/access_token`
-
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-grant_type | client_credentials | This should not be changed.
-client_id | - | Your unique client ID
-client_secret | - | Your unique client secret
-
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
-
 > To authorize, use this code:
 
 ```shell
@@ -50,37 +32,59 @@ curl --request POST \
   --form client_secret=CLIENT_SECRET
 ```
 
-```php
-<?php
+> The above command returns JSON structured like this:
 
-$curl = curl_init();
+```json
+[
+  {
+    "access_token": "49vg4POxZ5vkcPgixKDkreYhEQVscAqPNXqV64eE",
+    "token_type": "Bearer",
+    "expires_in": 3600
+  }
+]
+```
 
-curl_setopt_array($curl, array(
-  CURLOPT_URL => "http://example.curatr3.com/oauth/access_token",
-  CURLOPT_RETURNTRANSFER => true,
-  CURLOPT_ENCODING => "",
-  CURLOPT_MAXREDIRS => 10,
-  CURLOPT_TIMEOUT => 30,
-  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  CURLOPT_CUSTOMREQUEST => "POST",
-  CURLOPT_POSTFIELDS => "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"grant_type\"\r\n\r\nclient_credentials\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"client_id\"\r\n\r\nCLIENT_ID\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"client_secret\"\r\n\r\nCLIENT_SECRET\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--",
-  CURLOPT_HTTPHEADER => array(
-    "cache-control: no-cache",
-    "content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
-    "postman-token: b6e80070-0baa-e9cd-58cf-c71b7f711b99"
-  ),
-));
+> Make sure to replace `CLIENT_ID` and `CLIENT_SECRET` with the correct credentials for your organisation.
 
-$response = curl_exec($curl);
-$err = curl_error($curl);
 
-curl_close($curl);
+This endpoint gets a new OAuth access token.
 
-if ($err) {
-  echo "cURL Error #:" . $err;
-} else {
-  echo $response;
-}
+### HTTP Request
+
+`POST http://example.curatr3.com/oauth/access_token`
+
+### Body Parameters
+
+Parameter | Default | Description
+--------- | ------- | -----------
+grant_type | client_credentials | This will almways be 'client_credentials'
+client_id | - | Your unique client ID
+client_secret | - | Your unique client secret
+
+
+## Use an access token
+
+This endpoint gets a new OAuth access token.
+Curatr uses OAuth to authenticate API connections.
+
+Curatr expects for the OAuth token to be included in all API requests to the server in a header that looks like the following:
+
+`Authorization: Bearer {{bearerToken}}`
+
+<aside class="notice">
+You must replace <code>bearerToken</code> with a valid OAuth token.
+</aside>
+
+# Users
+
+## Get All Users
+
+> To authorize, use this code:
+
+```shell
+curl --request GET \
+  --url 'http://example.curatr3.com/api/v2/users' \
+  --header 'authorization: Bearer {{oauth_access_token}}'
 ```
 
 > The above command returns JSON structured like this:
@@ -104,90 +108,48 @@ if ($err) {
 ]
 ```
 
-> Make sure to replace `CLIENT_ID` and `CLIENT_SECRET` with the correct credentials for your organisation.
-
-Curatr uses OAuth to authenticate API connections.
-
-Curatr expects for the OAuth token to be included in all API requests to the server in a header that looks like the following:
-
-`Authorization: Bearer {{bearerToken}}`
-
-<aside class="notice">
-You must replace <code>bearerToken</code> with a valid OAuth token.
-</aside>
-
-# Users
-
-## Get All Users
-
-This endpoint retrieves all kittens.
+This endpoint retrieves all Users in your organisation.
 
 ### HTTP Request
 
-`GET http://example.com/api/kittens`
+`GET http://example.curatr3.com/api/v2/users`
 
 ### Query Parameters
 
 Parameter | Default | Description
 --------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
+filter | false | If set to true, the result will also include cats.
 available | true | If set to false, the result will include kittens that have already been adopted.
 
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
-
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
+## Get a Specific User
 
 ```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
+curl --request GET \
+  --url 'http://example.curatr3.com/api/v2/users/2' \
+  --header 'authorization: Bearer {{oauth_access_token}}'
 ```
 
 > The above command returns JSON structured like this:
 
 ```json
 {
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
+    "id": 2,
+    "fname": "Albus",
+    "lname": "Dumbledore",
+    "email": "a.dumbledore@hogwarts.edu",
+    "username": "a.dumbledore"
 }
 ```
 
-This endpoint retrieves a specific kitten.
-
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
+This endpoint retrieves a specific user.
 
 ### HTTP Request
 
-`GET http://example.com/kittens/<ID>`
+`GET http://example.curatr3.com/api/v2/users/<ID>`
 
 ### URL Parameters
 
 Parameter | Description
 --------- | -----------
-ID | The ID of the kitten to retrieve
+ID | The ID of the user to retrieve
 
